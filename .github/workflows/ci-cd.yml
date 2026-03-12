@@ -1,0 +1,78 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # ---- Back-end ----
+      - name: 📦 Instalar dependências (backend)
+        working-directory: ./backend
+        run: npm ci
+
+      - name: 🔨 Build (backend)
+        working-directory: ./backend
+        run: |
+          npx prisma generate
+          npm run build
+
+      - name: 🧪 Testes (backend)
+        working-directory: ./backend
+        run: npm test
+
+      # ---- Front-end ----
+      - name: 📦 Instalar dependências (frontend)
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: 🔨 Build (frontend)
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: 🧪 Testes (frontend)
+        working-directory: ./frontend
+        run: npm test
+
+  deploy:
+    name: Deploy
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      - name: 🚀 Deploy (placeholder)
+        run: |
+          echo "============================================"
+          echo "🚀 Deploy automático em nuvem"
+          echo "============================================"
+          echo "Este step será configurado com o provedor cloud"
+          echo "(ex: AWS, GCP, Azure, Vercel, Railway, etc.)"
+          echo ""
+          echo "Exemplos de configuração futura:"
+          echo "  - docker push para ECR/GCR"
+          echo "  - deploy via Vercel CLI"
+          echo "  - deploy via Railway CLI"
+          echo "  - kubectl apply para Kubernetes"
+          echo "============================================"
