@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import LoginPage from '../pages/LoginPage';
 import { AuthProvider } from '../contexts/AuthContext';
 
@@ -30,9 +30,26 @@ describe('LoginPage', () => {
     expect(link).toHaveAttribute('href', '/register');
   });
 
-  it('deve exibir a dica de demonstração', () => {
+  it('deve ter campos obrigatórios', () => {
     renderWithProviders(<LoginPage />);
 
-    expect(screen.getByText(/Demo:/)).toBeInTheDocument();
+    const emailField = screen.getByLabelText('E-mail');
+    const passwordField = screen.getByLabelText('Senha');
+
+    expect(emailField).toBeRequired();
+    expect(passwordField).toBeRequired();
+  });
+
+  it('deve ter placeholders corretos', () => {
+    renderWithProviders(<LoginPage />);
+
+    expect(screen.getByPlaceholderText('seu@email.com')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('••••••')).toBeInTheDocument();
+  });
+
+  it('deve renderizar a subtítulo de boas-vindas', () => {
+    renderWithProviders(<LoginPage />);
+
+    expect(screen.getByText('Entre na sua conta para continuar')).toBeInTheDocument();
   });
 });

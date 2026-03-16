@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials, RegisterData } from '../types';
-import { mockApi } from '../services/mockApi';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import type { User, LoginCredentials, RegisterData } from '../types';
+import { apiService } from '../services/apiService';
 
 interface AuthContextData {
   user: User | null;
@@ -30,7 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
-    const response = await mockApi.auth.login(credentials);
+    const response = await apiService.auth.login(credentials);
     const { user: loggedUser, token: authToken } = response.data;
     setUser(loggedUser);
     setToken(authToken);
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const register = async (data: RegisterData) => {
-    await mockApi.auth.register(data);
+    await apiService.auth.register(data);
   };
 
   const logout = () => {
