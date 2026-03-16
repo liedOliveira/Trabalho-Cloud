@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { mockApi } from '../services/mockApi';
+import { apiService } from '../services/apiService';
 import type { Appointment } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorAlert from '../components/ErrorAlert';
@@ -22,10 +22,10 @@ export default function AppointmentsPage() {
     try {
       setIsLoading(true);
       setError('');
-      const res = await mockApi.appointments.findAll();
+      const res = await apiService.appointments.findAll();
       setAppointments(res.data);
-    } catch {
-      setError('Erro ao carregar agendamentos.');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Erro ao carregar agendamentos.');
     } finally {
       setIsLoading(false);
     }
@@ -35,14 +35,14 @@ export default function AppointmentsPage() {
     e.preventDefault();
     setFormLoading(true);
     try {
-      await mockApi.appointments.create({ title, description, date });
+      await apiService.appointments.create({ title, description, date });
       setTitle('');
       setDescription('');
       setDate('');
       setShowForm(false);
       await loadAppointments();
-    } catch {
-      setError('Erro ao criar agendamento.');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Erro ao criar agendamento.');
     } finally {
       setFormLoading(false);
     }
@@ -51,10 +51,10 @@ export default function AppointmentsPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Deseja realmente excluir este agendamento?')) return;
     try {
-      await mockApi.appointments.delete(id);
+      await apiService.appointments.delete(id);
       await loadAppointments();
-    } catch {
-      setError('Erro ao excluir agendamento.');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Erro ao excluir agendamento.');
     }
   };
 
