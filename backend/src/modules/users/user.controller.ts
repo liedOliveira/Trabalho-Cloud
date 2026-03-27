@@ -4,6 +4,16 @@ import { UserService } from './user.service';
 const userService = new UserService();
 
 export class UserController {
+  async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = (req as any).user.id;
+      const user = await userService.findById(userId);
+      res.json({ status: 'success', data: user });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async findAll(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const users = await userService.findAll();

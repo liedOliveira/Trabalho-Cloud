@@ -9,6 +9,22 @@ const userController = new UserController();
 
 /**
  * @swagger
+ * /api/users/me:
+ *   get:
+ *     summary: Retorna o perfil do usuário autenticado
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Perfil do usuário logado
+ *       401:
+ *         description: Não autorizado
+ */
+router.get('/me', authMiddleware, userController.getProfile);
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Listar todos os usuários
