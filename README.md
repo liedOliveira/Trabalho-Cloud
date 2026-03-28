@@ -91,20 +91,6 @@ npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-Se quiser popular o banco com dados de exemplo:
-
-```bash
-npm run db:seed
-```
-
-Credenciais criadas pelo seed:
-
-| Tipo | Email | Senha |
-|------|-------|-------|
-| Admin | admin@agendapro.com | admin123 |
-| Cliente | maria@email.com | cliente123 |
-| Cliente | carlos@email.com | cliente123 |
-
 #### 2.3 Iniciar o servidor
 
 ```bash
@@ -120,6 +106,8 @@ info: Environment: development
 ```
 
 O terminal vai ficar "parado" — isso é normal, o servidor está rodando e esperando requisições. **Não feche esse terminal.**
+
+> **Opcional:** Se quiser popular o banco com dados de exemplo para testes, rode `npm run db:seed`. Isso cria usuários e agendamentos prontos. Caso contrário, basta criar sua conta pela tela de cadastro do frontend.
 
 ---
 
