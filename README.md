@@ -107,8 +107,6 @@ info: Environment: development
 
 O terminal vai ficar "parado" — isso é normal, o servidor está rodando e esperando requisições. **Não feche esse terminal.**
 
-> **Opcional:** Se quiser popular o banco com dados de exemplo para testes, rode `npm run db:seed`. Isso cria usuários e agendamentos prontos. Caso contrário, basta criar sua conta pela tela de cadastro do frontend.
-
 ---
 
 ### 3. Configurar o Front-end
