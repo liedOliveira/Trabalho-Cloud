@@ -33,8 +33,6 @@
 | **Node.js** | >= 18 | `node --version` |
 | **npm** | >= 9 | `npm --version` |
 | **Git** | qualquer | `git --version` |
-| **Docker** *(opcional)* | >= 20 | `docker --version` |
-| **Docker Compose** *(opcional)* | >= 2.0 | `docker compose version` |
 
 ---
 
@@ -47,53 +45,65 @@ git clone https://github.com/liedOliveira/Trabalho-Cloud.git
 cd Trabalho-Cloud
 ```
 
----
-
 ### 2. Configurar o Back-end
+
+Abra um terminal na raiz do projeto e execute:
 
 ```bash
 cd backend
-
-# Instalar dependências
 npm install
-
-# Copiar arquivo de variáveis de ambiente
-cp .env.example .env
 ```
 
-#### 2.1 Configurar o `.env`
+Depois, crie o arquivo de variáveis de ambiente. Copie o exemplo:
 
-Edite `backend/.env` com seus dados reais:
+- **Linux/Mac:** `cp .env.example .env`
+- **Windows (PowerShell):** `Copy-Item .env.example .env`
+- **Windows (Git Bash):** `cp .env.example .env`
+
+#### 2.1 Editar o `.env`
+
+Abra o arquivo `backend/.env` no editor e preencha com seus dados:
 
 ```env
 PORT=3333
 NODE_ENV=development
 CORS_ORIGIN=http://localhost:5173
 
-# Cole a URL do seu Supabase ou PostgreSQL local
+# Substitua pela URL do seu banco Supabase ou PostgreSQL local
 DATABASE_URL="postgresql://usuario:senha@host:5432/reservas_db?schema=public"
 
-# Troque a chave secreta
-JWT_SECRET="sua-chave-secreta-aqui"
+# Troque por uma chave secreta própria
+JWT_SECRET="minha-chave-secreta-123"
 JWT_EXPIRES_IN="7d"
 ```
 
-> **Supabase:** Para pegar a URL, acesse [supabase.com](https://supabase.com) > Settings > Database > Connection String (URI).
+**Como pegar a URL do Supabase:**
+1. Acesse [supabase.com](https://supabase.com) e entre no seu projeto
+2. Vá em **Settings > Database**
+3. Copie a **Connection String (URI)** e cole no `DATABASE_URL`
 
 #### 2.2 Gerar o Prisma Client e criar as tabelas
+
+Ainda dentro da pasta `backend/`, rode:
 
 ```bash
 npx prisma generate
 npx prisma migrate dev --name init
+```
 
-# Popular o banco com dados de exemplo (opcional)
+Se quiser popular o banco com dados de exemplo:
+
+```bash
 npm run db:seed
 ```
 
-Credenciais do seed:
-- Admin: `admin@agendapro.com` / `admin123`
-- Cliente: `maria@email.com` / `cliente123`
-- Cliente: `carlos@email.com` / `cliente123`
+Credenciais criadas pelo seed:
+
+| Tipo | Email | Senha |
+|------|-------|-------|
+| Admin | admin@agendapro.com | admin123 |
+| Cliente | maria@email.com | cliente123 |
+| Cliente | carlos@email.com | cliente123 |
 
 #### 2.3 Iniciar o servidor
 
@@ -101,61 +111,66 @@ Credenciais do seed:
 npm run dev
 ```
 
-O backend roda em **http://localhost:3333** e a documentação Swagger em **http://localhost:3333/api-docs**
+Se tudo der certo, o terminal vai mostrar:
+
+```
+info: Server running on http://localhost:3333
+info: Swagger docs at http://localhost:3333/api-docs
+info: Environment: development
+```
+
+O terminal vai ficar "parado" — isso é normal, o servidor está rodando e esperando requisições. **Não feche esse terminal.**
 
 ---
 
 ### 3. Configurar o Front-end
 
+Abra **outro terminal** (mantenha o backend rodando) na raiz do projeto:
+
 ```bash
-cd ../frontend
+cd frontend
 npm install
 npm run dev
 ```
 
-O frontend roda em **http://localhost:5173**
+O frontend vai abrir em **http://localhost:5173**
 
-Se quiser apontar para outra URL de API, crie `frontend/.env`:
-```env
-VITE_API_URL=http://localhost:3333/api
-```
-
----
-
-### 4. Executar com Docker Compose (alternativa)
-
-```bash
-# Na raiz do projeto
-cp backend/.env.example backend/.env
-
-# No .env, ajuste a DATABASE_URL para o container:
-# DATABASE_URL="postgresql://reservas:reservas123@db:5432/reservas_db?schema=public"
-
-docker compose up -d
-docker compose ps
-```
-
-Sobe a API em `http://localhost:3333` e o PostgreSQL em `localhost:5432`.
-
-Para parar: `docker compose down`
+> Se a API estiver em outra URL, crie um arquivo `frontend/.env` com:
+> ```env
+> VITE_API_URL=http://localhost:3333/api
+> ```
 
 ---
 
-## Testes
+### 4. Testar a aplicação
+
+1. Acesse **http://localhost:5173** no navegador
+2. Faça login com as credenciais do seed (ex: `admin@agendapro.com` / `admin123`)
+3. Acesse o Dashboard e a página de Agendamentos
+
+---
+
+## Testes automatizados
+
+Os testes não precisam do servidor rodando — usam mocks.
 
 ```bash
-# Back-end (32 testes com Jest + Supertest)
+# Back-end (32 testes)
 cd backend
 npm test
 
-# Front-end (9 testes com Vitest + RTL)
-cd ../frontend
+# Front-end (9 testes)
+cd frontend
 npm test
 ```
+
+> Os logs do backend durante os testes podem mostrar mensagens de erro em vermelho (ex: "Credenciais inválidas"). Isso é **normal** — são os testes verificando que os erros são tratados corretamente. O que importa é o resultado final: `Tests: 32 passed, 32 total`.
 
 ---
 
 ## Rotas da API
+
+A documentação completa com exemplos está disponível no Swagger: **http://localhost:3333/api-docs**
 
 | Método | Rota | Auth | Descrição |
 |--------|------|:----:|-----------|
