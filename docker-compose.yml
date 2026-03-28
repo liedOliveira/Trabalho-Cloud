@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # ---- Back-end API ----
   api:
     build:
       context: ./backend
@@ -22,7 +21,6 @@ services:
     networks:
       - app-network
 
-  # ---- Banco de Dados (dev local) ----
   db:
     image: postgres:16-alpine
     container_name: reservas-db

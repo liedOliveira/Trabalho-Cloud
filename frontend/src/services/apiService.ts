@@ -1,11 +1,10 @@
 import { api } from './api';
 import type { User, Appointment, AuthResponse, RegisterData, LoginCredentials, ApiResponse } from '../types';
 
-// ============================================================
-//  Serviço de API real — substitui o mockApi.ts
-//  Todas as chamadas passam pelo Axios (api.ts) com JWT
-// ============================================================
-
+/**
+ * Serviço que encapsula as chamadas à API real.
+ * Substitui o antigo mockApi que usava dados estáticos.
+ */
 export const apiService = {
   auth: {
     async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {

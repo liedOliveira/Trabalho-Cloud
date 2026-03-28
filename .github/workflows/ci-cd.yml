@@ -10,18 +10,15 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  # ============================================
-  #  Job 1: Build & Test
-  # ============================================
   build-and-test:
-    name: 🔨 Build & Test
+    name: Build & Test
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js ${{ env.NODE_VERSION }}
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -30,18 +27,18 @@ jobs:
             backend/package-lock.json
             frontend/package-lock.json
 
-      # ---- Back-end ----
-      - name: 📦 Instalar dependências (backend)
+      # Back-end
+      - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
 
-      - name: 🔨 Build (backend)
+      - name: Build backend
         working-directory: ./backend
         run: |
           npx prisma generate
           npm run build
 
-      - name: 🧪 Testes (backend)
+      - name: Run backend tests
         working-directory: ./backend
         run: npm test
         env:
@@ -49,21 +46,20 @@ jobs:
           JWT_SECRET: test-secret-ci
           DATABASE_URL: postgresql://localhost:5432/test_db
 
-      # ---- Front-end ----
-      - name: 📦 Instalar dependências (frontend)
+      # Front-end
+      - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
 
-      - name: 🔨 Build (frontend)
+      - name: Build frontend
         working-directory: ./frontend
         run: npm run build
 
-      - name: 🧪 Testes (frontend)
+      - name: Run frontend tests
         working-directory: ./frontend
         run: npm test
 
-      # ---- Upload de artefatos ----
-      - name: 📤 Upload build do frontend
+      - name: Upload frontend build
         uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
@@ -71,27 +67,24 @@ jobs:
           path: frontend/dist
           retention-days: 7
 
-  # ============================================
-  #  Job 2: Deploy Back-end (Docker)
-  # ============================================
   deploy-backend:
-    name: 🐳 Deploy Back-end
+    name: Deploy Back-end
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: 📥 Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🔐 Login no Docker Registry
+      - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: 🐳 Build e Push da imagem Docker
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -100,58 +93,48 @@ jobs:
             ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
             ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }}
 
-      - name: 🚀 Deploy no servidor
+      - name: Deploy status
         run: |
-          echo "============================================"
-          echo "🚀 Deploy automático do back-end"
-          echo "============================================"
-          echo "Imagem: ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }}"
+          echo "Backend deploy triggered."
+          echo "Image: ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }}"
           echo ""
-          echo "Para ativar o deploy real, configure os secrets:"
-          echo "  - DOCKER_REGISTRY (ex: ghcr.io)"
+          echo "To enable real deployment, set these secrets:"
+          echo "  - DOCKER_REGISTRY (e.g. ghcr.io)"
           echo "  - DOCKER_USERNAME"
           echo "  - DOCKER_PASSWORD"
-          echo "  - DOCKER_IMAGE_NAME (ex: usuario/reservas-api)"
-          echo "============================================"
+          echo "  - DOCKER_IMAGE_NAME (e.g. user/reservas-api)"
 
-  # ============================================
-  #  Job 3: Deploy Front-end (Vercel)
-  # ============================================
   deploy-frontend:
-    name: 🔺 Deploy Front-end
+    name: Deploy Front-end
     needs: build-and-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: 📥 Checkout do código
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 📦 Instalar dependências
+      - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
 
-      - name: 🔨 Build de produção
+      - name: Build for production
         working-directory: ./frontend
         run: npm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
-      - name: 🔺 Deploy para Vercel
+      - name: Deploy status
         run: |
-          echo "============================================"
-          echo "🔺 Deploy automático do front-end"
-          echo "============================================"
-          echo "Build disponível em frontend/dist/"
+          echo "Frontend build complete. Output at frontend/dist/"
           echo ""
-          echo "Para ativar o deploy real, configure:"
+          echo "To enable real deployment, set these secrets:"
           echo "  - VERCEL_TOKEN"
           echo "  - VERCEL_ORG_ID"
           echo "  - VERCEL_PROJECT_ID"
-          echo "  - VITE_API_URL (URL da API em produção)"
-          echo "============================================"
+          echo "  - VITE_API_URL"

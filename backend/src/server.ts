@@ -6,22 +6,21 @@ import { checkDatabaseConnection } from './lib/prisma';
 const PORT = Number(env.PORT) || 3333;
 
 async function bootstrap() {
-  // Verifica conexão com o banco antes de subir o servidor
   const dbConnected = await checkDatabaseConnection();
 
   if (!dbConnected && env.NODE_ENV === 'production') {
-    logger.error('Encerrando: não foi possível conectar ao banco de dados');
+    logger.error('Could not connect to the database, shutting down');
     process.exit(1);
   }
 
   if (!dbConnected) {
-    logger.warn('⚠️  Banco de dados não conectado. A API pode não funcionar corretamente.');
+    logger.warn('Database not connected. Some features may not work.');
   }
 
   app.listen(PORT, () => {
-    logger.info(`🚀 Servidor rodando em http://localhost:${PORT}`);
-    logger.info(`📚 Swagger disponível em http://localhost:${PORT}/api-docs`);
-    logger.info(`🌍 Ambiente: ${env.NODE_ENV}`);
+    logger.info(`Server running on http://localhost:${PORT}`);
+    logger.info(`Swagger docs at http://localhost:${PORT}/api-docs`);
+    logger.info(`Environment: ${env.NODE_ENV}`);
   });
 }
 

@@ -13,7 +13,7 @@ import { logger } from './utils/logger';
 
 const app = express();
 
-// ----- Middlewares globais -----
+// Global middlewares
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
@@ -26,7 +26,7 @@ app.use(
   })
 );
 
-// ----- Swagger -----
+// Swagger config
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
     openapi: '3.0.0',
@@ -52,7 +52,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ----- Rotas -----
+// Routes
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
@@ -61,7 +61,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/appointments', appointmentRoutes);
 
-// ----- Error handler global -----
+// Error handling
 app.use(errorHandler);
 
 export { app };
