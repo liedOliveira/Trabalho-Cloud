@@ -94,7 +94,9 @@ export default function LoginPage() {
 
           {/* Hint for demo */}
           <div className="mt-4 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
-            <p className="text-xs text-indigo-700 font-medium">🔑 Demo: use <strong>joao@email.com</strong> com qualquer senha (6+ caracteres)</p>
+            <p className="text-xs text-indigo-700 font-medium">Credenciais do seed:</p>
+            <p className="text-xs text-indigo-600 mt-1"><strong>Admin:</strong> admin@agendapro.com / admin123</p>
+            <p className="text-xs text-indigo-600"><strong>Cliente:</strong> maria@email.com / cliente123</p>
           </div>
         </div>
       </div>

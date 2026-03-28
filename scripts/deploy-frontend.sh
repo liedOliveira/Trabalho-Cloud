@@ -1,35 +1,29 @@
 #!/bin/bash
-# ==============================================
-#  Script de Deploy — Front-end (Vercel / Netlify)
-# ==============================================
+# Deploy do front-end (Vercel ou Netlify)
 set -e
-
-echo "🚀 Iniciando deploy do front-end..."
 
 cd frontend
 
-echo "📦 Instalando dependências..."
+echo "Installing dependencies..."
 npm ci
 
-echo "🔨 Gerando build de produção..."
+echo "Building for production..."
 VITE_API_URL="${VITE_API_URL:-https://api.seudominio.com/api}" npm run build
 
-echo "📁 Build gerado em: frontend/dist/"
+echo "Build output: frontend/dist/"
 
-# --- Deploy para Vercel (se CLI disponível) ---
+# Tenta deploy via Vercel ou Netlify se o CLI estiver instalado
 if command -v vercel &> /dev/null; then
-  echo "🔺 Vercel CLI detectado — executando deploy..."
+  echo "Vercel CLI found, deploying..."
   vercel --prod --yes
-  echo "✅ Deploy Vercel concluído!"
-# --- Deploy para Netlify (se CLI disponível) ---
+  echo "Vercel deploy complete."
 elif command -v netlify &> /dev/null; then
-  echo "🔷 Netlify CLI detectado — executando deploy..."
+  echo "Netlify CLI found, deploying..."
   netlify deploy --prod --dir=dist
-  echo "✅ Deploy Netlify concluído!"
+  echo "Netlify deploy complete."
 else
-  echo "⚠️  Nenhum CLI de deploy detectado (vercel/netlify)."
-  echo "   O build está disponível em frontend/dist/ para deploy manual."
+  echo "No deploy CLI found (vercel/netlify)."
+  echo "Build available at frontend/dist/ for manual deploy."
 fi
 
-echo ""
-echo "✅ Deploy do front-end concluído!"
+echo "Frontend deploy finished."

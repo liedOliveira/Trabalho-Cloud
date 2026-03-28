@@ -5,9 +5,8 @@ const prisma = new PrismaClient();
 const { hash } = bcryptjs;
 
 async function main() {
-  console.log('🌱 Iniciando seed do banco de dados...\n');
+  console.log('Running database seed...\n');
 
-  // --- Criar Usuários ---
   const adminPassword = await hash('admin123', 10);
   const clientPassword = await hash('cliente123', 10);
 
@@ -44,9 +43,8 @@ async function main() {
     },
   });
 
-  console.log('✅ Usuários criados:', { admin: admin.email, maria: maria.email, carlos: carlos.email });
+  console.log('Users created:', { admin: admin.email, maria: maria.email, carlos: carlos.email });
 
-  // --- Criar Agendamentos ---
   const appointmentsData = [
     {
       title: 'Consultoria de Marketing',
@@ -82,17 +80,18 @@ async function main() {
     await prisma.appointment.create({ data });
   }
 
-  console.log(`✅ ${appointmentsData.length} agendamentos criados`);
-  console.log('\n🎉 Seed concluído com sucesso!');
-  console.log('\n📋 Credenciais de acesso:');
-  console.log('   Admin:   admin@agendapro.com  / admin123');
-  console.log('   Cliente: maria@email.com      / cliente123');
-  console.log('   Cliente: carlos@email.com     / cliente123');
+  console.log(`${appointmentsData.length} appointments created`);
+
+  console.log('\nSeed completed.');
+  console.log('Login credentials:');
+  console.log('  Admin:  admin@agendapro.com  / admin123');
+  console.log('  Client: maria@email.com      / cliente123');
+  console.log('  Client: carlos@email.com     / cliente123');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Erro no seed:', e);
+    console.error('Seed failed:', e);
     process.exit(1);
   })
   .finally(async () => {
