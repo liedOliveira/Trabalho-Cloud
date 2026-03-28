@@ -77,32 +77,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Login to Docker Registry
+      - name: Build Docker image
+        working-directory: ./backend
+        run: docker build -t reservas-api:${{ github.sha }} .
+
+      - name: Login and push to registry
+        if: ${{ secrets.DOCKER_USERNAME != '' }}
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.DOCKER_REGISTRY }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./backend
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
-            ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+      - name: Push Docker image
+        if: ${{ secrets.DOCKER_USERNAME != '' }}
+        run: |
+          docker tag reservas-api:${{ github.sha }} ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
+          docker push ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:latest
 
       - name: Deploy status
         run: |
-          echo "Backend deploy triggered."
-          echo "Image: ${{ secrets.DOCKER_REGISTRY }}/${{ secrets.DOCKER_IMAGE_NAME }}:${{ github.sha }}"
-          echo ""
-          echo "To enable real deployment, set these secrets:"
-          echo "  - DOCKER_REGISTRY (e.g. ghcr.io)"
-          echo "  - DOCKER_USERNAME"
-          echo "  - DOCKER_PASSWORD"
-          echo "  - DOCKER_IMAGE_NAME (e.g. user/reservas-api)"
+          echo "Docker image built: reservas-api:${{ github.sha }}"
 
   deploy-frontend:
     name: Deploy Front-end
